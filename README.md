@@ -18,11 +18,23 @@ The sample images are stored in `samples/`.
 
 ## Setup
 
-Create a virtual environment and install the dependencies:
+Clone this repository:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+git clone https://github.com/junwon0901/foundation-models-midterm.git
+cd foundation-models-midterm
+```
+
+Create and activate a conda environment:
+
+```bash
+conda create -n 2026010688 python=3.10 -y
+conda activate 2026010688
+```
+
+Install the dependencies:
+
+```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirement.txt
 ```
