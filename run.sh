@@ -12,9 +12,8 @@ Usage:
   ./run.sh qwen3-vl
 
 Before running:
-  python3 -m venv .venv
-  source .venv/bin/activate
   ./setup.sh
+  conda activate 2026010688
 USAGE
 }
 

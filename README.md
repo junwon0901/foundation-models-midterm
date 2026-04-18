@@ -17,33 +17,6 @@ chmod +x setup.sh
 conda activate 2026010688
 ```
 
-By default, `setup.sh` reads the CUDA version reported by `nvidia-smi` and chooses the newest supported PyTorch build automatically:
-
-```text
-CUDA >= 12.8 -> cu128
-CUDA >= 12.4 -> cu124
-otherwise    -> cpu
-```
-
-This detection is based on the CUDA version exposed by the installed NVIDIA driver. In practice, that is a good default for choosing the highest matching PyTorch wheel, but it does not guarantee that every package combination on every machine is optimal. If the detected choice does not work well on your system, force the runtime manually.
-
-If you want to force a runtime:
-
-```bash
-./setup.sh cpu
-./setup.sh cu124
-./setup.sh cu128
-```
-
-`setup.sh` reinstalls the PyTorch stack explicitly, then installs the pinned project dependencies. This avoids the common case where an older `torch` build stays in the environment and keeps forcing CPU fallback.
-
-`setup.sh` requires `conda`. It creates the environment automatically and installs everything into `2026010688` by default. You can override the env name:
-
-```bash
-./setup.sh cu124 myenv
-conda activate myenv
-```
-
 ## Run with helper script
 
 ```bash
@@ -141,4 +114,3 @@ You: exit
 - First run downloads model weights.
 - Grounding DINO and SAM2 require a display for Matplotlib windows.
 - Qwen3-VL can be heavy; CUDA is recommended.
-- If `Using device: cpu` appears unexpectedly, run `nvidia-smi` first, then try `./setup.sh cu124` or `./setup.sh cu128`, and check `python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"`.
