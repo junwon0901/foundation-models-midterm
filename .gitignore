@@ -7,3 +7,4 @@ env/
 .env
 .cache/
 foundation-models
+.codex

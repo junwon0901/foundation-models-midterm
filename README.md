@@ -12,10 +12,9 @@ cd foundation-models-midterm
 Using Conda:
 
 ```bash
-conda create -n 2026010688 python=3.10 -y
+chmod +x setup.sh
+./setup.sh
 conda activate 2026010688
-python -m pip install --upgrade pip
-python -m pip install -r requirement.txt
 ```
 
 Using venv:
@@ -23,15 +22,25 @@ Using venv:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirement.txt
+chmod +x setup.sh
+./setup.sh
 ```
 
-CUDA example:
+If you want to force a runtime:
 
 ```bash
-python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-python -m pip install -r requirement.txt
+./setup.sh cpu
+./setup.sh cu124
+./setup.sh cu128
+```
+
+`setup.sh` reinstalls the PyTorch stack explicitly, then installs the pinned project dependencies. This avoids the common case where an older `torch` build stays in the environment and keeps forcing CPU fallback.
+
+When `conda` is installed, `setup.sh` creates the environment automatically and installs everything into `2026010688` by default. You can override the env name:
+
+```bash
+./setup.sh cu124 myenv
+conda activate myenv
 ```
 
 ## Run with helper script
@@ -114,3 +123,4 @@ You: exit
 - First run downloads model weights.
 - Grounding DINO and SAM2 require a display for Matplotlib windows.
 - Qwen3-VL can be heavy; CUDA is recommended.
+- If `Using device: cpu` appears unexpectedly, rerun `./setup.sh cu124` and then check `python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"`.
