@@ -12,7 +12,7 @@ The project focuses on three representative multimodal or vision foundation mode
 | `SAM2-small.py` | SAM2 Hiera Small | Interactive point-based segmentation | `facebook/sam2-hiera-small` |
 | `Qwen3-VL-#B-Instruct.py` | Qwen3-VL 2B Instruct | Visual question answering | `Qwen/Qwen3-VL-2B-Instruct` |
 
-The sample images are stored in `samples/`. The runner script creates a local `foundation-models` symlink to `samples/` because the Python scripts use fixed relative image paths.
+The sample images are stored in `samples/`, and each script reads images from that directory relative to the repository root.
 
 ## Project Structure
 
@@ -49,7 +49,7 @@ Important prompt format:
 
 Output behavior:
 
-- Loads `foundation-models/classroom_test.jpg`.
+- Loads `samples/classroom_test.jpg`.
 - Runs zero-shot object detection.
 - Draws bounding boxes, labels, and confidence scores.
 - Displays the result in a Matplotlib window.
@@ -81,7 +81,7 @@ Interaction controls:
 
 Output behavior:
 
-- Loads `foundation-models/classroom_test.jpg`.
+- Loads `samples/xai506_example_image.jpg`.
 - Opens an interactive Matplotlib window.
 - Collects positive and negative point prompts.
 - Runs SAM2 segmentation.
@@ -113,7 +113,7 @@ How many people are in this image?. Answer in one sentence.
 
 Output behavior:
 
-- Loads `foundation-models/xai506_example_image.jpg`.
+- Loads `samples/xai506_example_image.jpg`.
 - Applies the Qwen chat template.
 - Generates an answer with `max_new_tokens=128`.
 - Prints the decoded answer to the terminal.
@@ -213,7 +213,7 @@ python SAM2-small.py
 python "Qwen3-VL-#B-Instruct.py"
 ```
 
-When running scripts directly, make sure the expected image paths exist. The easiest way is to run through `run.sh`, which prepares the `foundation-models -> samples` symlink automatically.
+Run commands from the repository root so the scripts can find the files inside `samples/`.
 
 ## Output Summary
 

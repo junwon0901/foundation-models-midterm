@@ -18,7 +18,7 @@ messages = [
         "content": [
             {
                 "type": "image",
-                "image": "foundation-models/xai506_example_image.jpg",
+                "image": "samples/xai506_example_image.jpg",
             },
             {"type": "text", "text": "How many people are in this image?. Answer in one sentence."},
         ],

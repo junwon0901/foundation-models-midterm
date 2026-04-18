@@ -15,7 +15,7 @@ print(f"Using device: {device}")
 processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device)
 
-image_path = "foundation-models/classroom_test.jpg"
+image_path = "samples/classroom_test.jpg"
 image = Image.open(image_path)
 # Check for cats and remote controls
 # VERY important: text queries need to be lowercased + end with a dot

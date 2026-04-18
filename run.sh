@@ -18,14 +18,10 @@ Before running:
 USAGE
 }
 
-prepare_paths() {
+check_samples() {
   if [ ! -d "samples" ]; then
     echo "Error: samples directory is missing." >&2
     exit 1
-  fi
-
-  if [ ! -e "foundation-models" ]; then
-    ln -s samples foundation-models
   fi
 }
 
@@ -47,15 +43,15 @@ case "$command_name" in
     usage
     ;;
   grounding-dino|grounding|dino)
-    prepare_paths
+    check_samples
     run_python "Grounding-DINO.py"
     ;;
   sam2|sam)
-    prepare_paths
+    check_samples
     run_python "SAM2-small.py"
     ;;
   qwen3-vl|qwen|vlm)
-    prepare_paths
+    check_samples
     run_python "Qwen3-VL-#B-Instruct.py"
     ;;
   *)

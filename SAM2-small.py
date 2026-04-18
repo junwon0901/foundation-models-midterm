@@ -14,7 +14,7 @@ print(f"Using device: {device}")
 
 processor = Sam2Processor.from_pretrained(model_id)
 
-image_path = "foundation-models/classroom_test.jpg"
+image_path = "samples/xai506_example_image.jpg"
 raw_image = Image.open(image_path).convert("RGB")
 
 def get_click_inputs(image):
