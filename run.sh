@@ -48,11 +48,11 @@ case "$command_name" in
     ;;
   sam2|sam)
     check_samples
-    run_python "SAM2-small.py"
+    run_python "SAM2-base-plus.py"
     ;;
   qwen3-vl|qwen|vlm)
     check_samples
-    run_python "Qwen3-VL-#B-Instruct.py"
+    run_python "Qwen3-VL-8B-Instruct.py"
     ;;
   *)
     echo "Unknown command: $command_name" >&2

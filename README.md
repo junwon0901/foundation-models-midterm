@@ -8,9 +8,9 @@ The project focuses on three representative multimodal or vision foundation mode
 
 | Script | Model | Task | Hugging Face ID |
 |--------|-------|------|-----------------|
-| `Grounding-DINO.py` | Grounding DINO Tiny | Open-vocabulary object detection | `IDEA-Research/grounding-dino-tiny` |
-| `SAM2-small.py` | SAM2 Hiera Small | Interactive point-based segmentation | `facebook/sam2-hiera-small` |
-| `Qwen3-VL-#B-Instruct.py` | Qwen3-VL 2B Instruct | Visual question answering | `Qwen/Qwen3-VL-2B-Instruct` |
+| `Grounding-DINO.py` | Grounding DINO Base | Open-vocabulary object detection | `IDEA-Research/grounding-dino-base` |
+| `SAM2-base-plus.py` | SAM2 Hiera Base Plus | Interactive point-based segmentation | `facebook/sam2-hiera-base-plus` |
+| `Qwen3-VL-8B-Instruct.py` | Qwen3-VL 8B Instruct | Visual question answering | `Qwen/Qwen3-VL-8B-Instruct` |
 
 The sample images are stored in `samples/`, and each script reads images from that directory relative to the repository root.
 
@@ -19,11 +19,14 @@ The sample images are stored in `samples/`, and each script reads images from th
 ```text
 foundation-models/
 |-- Grounding-DINO.py            # Open-vocabulary object detection demo
-|-- SAM2-small.py                # Interactive SAM2 segmentation demo
-|-- Qwen3-VL-#B-Instruct.py      # Visual question answering demo
+|-- SAM2-base-plus.py            # Interactive SAM2 segmentation demo
+|-- Qwen3-VL-8B-Instruct.py      # Visual question answering demo
 |-- samples/
 |   |-- classroom_test.jpg       # Input image for Grounding DINO and SAM2
 |   `-- xai506_example_image.jpg # Input image for Qwen3-VL
+|-- result/
+|   |-- Grounding-DINO-base_result.png
+|   `-- SAM2-base-plus_result.png
 |-- run.sh                       # Unified command-line runner
 |-- requirement.txt              # Python dependencies
 `-- README.md
@@ -31,7 +34,7 @@ foundation-models/
 
 ## Model Details
 
-### 1. Open-Vocabulary Object Detection - Grounding DINO Tiny
+### 1. Open-Vocabulary Object Detection - Grounding DINO Base
 
 Grounding DINO detects objects in an image from a natural-language text prompt. Unlike a closed-set detector, it is not limited to a fixed list of predefined categories.
 
@@ -52,6 +55,7 @@ Output behavior:
 - Loads `samples/classroom_test.jpg`.
 - Runs zero-shot object detection.
 - Draws bounding boxes, labels, and confidence scores.
+- Saves the result to `result/Grounding-DINO-base_result.png`.
 - Displays the result in a Matplotlib window.
 
 Core flow:
@@ -66,26 +70,27 @@ Load processor and model
 -> Display result
 ```
 
-### 2. Interactive Point-Based Segmentation - SAM2 Hiera Small
+### 2. Interactive Selected-Student Segmentation - SAM2 Hiera Base Plus
 
-SAM2 segments a target object or region from user-provided point prompts. Positive clicks tell the model what to include, and negative clicks tell it what to exclude.
+SAM2 segments selected students from user-provided point prompts. Each left click is treated as a separate selected student, and right clicks are used as shared negative prompts to suppress unselected students or background regions.
 
 Interaction controls:
 
 | Action | Meaning |
 |--------|---------|
-| Left click | Add a positive point |
-| Right click | Add a negative point |
+| Left click | Select one student to mask |
+| Right click | Mark a student or background region to exclude |
 | Backspace | Remove the most recent point |
 | Enter | Finish point selection and run segmentation |
 
 Output behavior:
 
-- Loads `samples/xai506_example_image.jpg`.
+- Loads `samples/classroom_test.jpg`.
 - Opens an interactive Matplotlib window.
 - Collects positive and negative point prompts.
-- Runs SAM2 segmentation.
-- Displays the best predicted mask over the original image.
+- Runs SAM2 segmentation for each selected student.
+- Saves a side-by-side click and mask result to `result/SAM2-base-plus_result.png`.
+- Displays the same side-by-side result in a Matplotlib window.
 
 Core flow:
 
@@ -94,18 +99,18 @@ Load processor and model
 -> Load input image
 -> Open interactive click window
 -> Collect point coordinates and labels
--> Encode image, points, and labels
+-> Encode each positive click as a separate target object
 -> Run inference with torch.no_grad()
 -> Post-process predicted masks
--> Select the best mask
--> Display segmentation overlay
+-> Combine selected-student masks
+-> Save and display a side-by-side click/mask result
 ```
 
-### 3. Visual Question Answering - Qwen3-VL-2B-Instruct
+### 3. Visual Question Answering - Qwen3-VL-8B-Instruct
 
 Qwen3-VL is a vision-language model that answers natural-language questions about an image. This demo sends one image and one text question to the model, then prints the generated answer.
 
-The default question in `Qwen3-VL-#B-Instruct.py` is:
+The default question in `Qwen3-VL-8B-Instruct.py` is:
 
 ```text
 How many people are in this image?. Answer in one sentence.
@@ -209,8 +214,8 @@ The scripts can also be run directly:
 
 ```bash
 python Grounding-DINO.py
-python SAM2-small.py
-python "Qwen3-VL-#B-Instruct.py"
+python SAM2-base-plus.py
+python Qwen3-VL-8B-Instruct.py
 ```
 
 Run commands from the repository root so the scripts can find the files inside `samples/`.
@@ -219,11 +224,21 @@ Run commands from the repository root so the scripts can find the files inside `
 
 | Demo | Output |
 |------|--------|
-| Grounding DINO | Matplotlib window with bounding boxes, object labels, and confidence scores |
-| SAM2 | Interactive point-selection window, followed by a segmentation mask overlay |
+| Grounding DINO | Matplotlib window and saved image with bounding boxes, object labels, and confidence scores |
+| SAM2 | Interactive point-selection window, followed by a saved side-by-side click and mask result |
 | Qwen3-VL | Text answer printed in the terminal |
 
-Current scripts display results but do not automatically save output images. To save visual results, add `plt.savefig(...)` before `plt.show()` in the relevant script.
+Grounding DINO and SAM2 save visual outputs in the `result/` directory.
+
+### Saved Result Images
+
+#### Grounding DINO Base
+
+![Grounding DINO Base result](result/Grounding-DINO-base_result.png)
+
+#### SAM2 Hiera Base Plus
+
+![SAM2 Hiera Base Plus result](result/SAM2-base-plus_result.png)
 
 ## Environment
 
@@ -236,7 +251,7 @@ Current scripts display results but do not automatically save output images. To 
 | Hugging Face token | Not required for the listed public models |
 | Display | Required for Matplotlib windows in Grounding DINO and SAM2 |
 
-Qwen3-VL-2B can be slow on CPU. A CUDA GPU is recommended for faster inference, especially for repeated testing.
+Qwen3-VL-8B can be slow on CPU and needs substantially more memory than the 2B variant. A CUDA GPU is recommended for faster inference, especially for repeated testing.
 
 ## Notes
 

@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from PIL import Image
 from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection 
+from pathlib import Path
 
-model_id = "IDEA-Research/grounding-dino-tiny"
+model_id = "IDEA-Research/grounding-dino-base"
 device = (
     "cuda" if torch.cuda.is_available()
     else "mps" if torch.backends.mps.is_available()
@@ -15,8 +16,10 @@ print(f"Using device: {device}")
 processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device)
 
-image_path = "samples/classroom_test.jpg"
+image_path = "samples/xai506_example_image.jpg"
 image = Image.open(image_path)
+result_dir = Path("result")
+result_path = result_dir / "Grounding-DINO-base_result.png"
 # Check for cats and remote controls
 # VERY important: text queries need to be lowercased + end with a dot
 text = "a glasses. a person. a chair. a table."
@@ -28,7 +31,7 @@ with torch.no_grad():
 results = processor.post_process_grounded_object_detection(
     outputs,
     inputs.input_ids,
-    threshold=0.4,
+    threshold=0.3,
     text_threshold=0.3,
     target_sizes=[image.size[::-1]]
 )
@@ -66,4 +69,8 @@ for box, score, label in zip(boxes, scores, labels):
 
 ax.set_title("Grounding DINO detections")
 ax.axis("off")
+fig.tight_layout()
+result_dir.mkdir(exist_ok=True)
+fig.savefig(result_path, dpi=200, bbox_inches="tight")
+print(f"Saved result to {result_path}")
 plt.show()
