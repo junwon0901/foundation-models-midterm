@@ -4,8 +4,8 @@ from pathlib import Path
 import torch
 from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 
-MODEL_ID = "Qwen/Qwen3-VL-2B-Instruct"
-DEFAULT_IMAGE = "samples/classroom_test.jpg"
+MODEL_ID = "Qwen/Qwen3-VL-8B-Instruct"
+DEFAULT_IMAGE = "samples/xai506_example_image.jpg"
 
 def get_device():
     if torch.cuda.is_available():
