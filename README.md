@@ -16,6 +16,7 @@ chmod +x setup.sh
 ./setup.sh
 conda activate 2026010688
 ```
+This setup takes about 2 minutes.
 
 ## Run with helper script
 
