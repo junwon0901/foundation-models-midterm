@@ -75,11 +75,29 @@ python Qwen3-VL-8B-Instruct.py
 
 ### Qwen3-VL
 
-- Model: `Qwen/Qwen3-VL-8B-Instruct`
+- Model: `Qwen/Qwen3-VL-2B-Instruct`
 - Task: visual question answering
-- Input: `samples/xai506_example_image.jpg`
-- Question: `How many people are in this image?. Answer in one sentence.`
-- Output: terminal text
+- Input: `samples/classroom_test.jpg`
+- Ask multiple questions about the image in the terminal.
+- Type `exit` or `quit` to stop.
+- Use another image: `python Qwen3-VL-8B-Instruct.py --image samples/xai506_example_image.jpg`
+
+Example conversation:
+
+```text
+$ python Qwen3-VL-8B-Instruct.py
+Using device: mps
+Image: samples/classroom_test.jpg
+Ask questions about the image. Type 'exit' or 'quit' to stop.
+
+You: How many people are in this image?
+Qwen3-VL: There are several people sitting in a classroom.
+
+You: What are they doing?
+Qwen3-VL: They appear to be attending a class or lecture.
+
+You: exit
+```
 
 ## Results
 
@@ -95,4 +113,4 @@ python Qwen3-VL-8B-Instruct.py
 
 - First run downloads model weights.
 - Grounding DINO and SAM2 require a display for Matplotlib windows.
-- Qwen3-VL 8B is heavy; CUDA is recommended.
+- Qwen3-VL can be heavy; CUDA is recommended.
