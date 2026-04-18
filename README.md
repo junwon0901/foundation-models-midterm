@@ -2,27 +2,6 @@
 
 Three Hugging Face vision foundation model demos: object detection, selected-target segmentation, and visual question answering.
 
-## Models
-
-| Script | Model | Task |
-|--------|-------|------|
-| `Grounding-DINO.py` | `IDEA-Research/grounding-dino-base` | Open-vocabulary object detection |
-| `SAM2-base-plus.py` | `facebook/sam2-hiera-base-plus` | Selected-target segmentation |
-| `Qwen3-VL-8B-Instruct.py` | `Qwen/Qwen3-VL-8B-Instruct` | Visual question answering |
-
-## Files
-
-```text
-Grounding-DINO.py
-SAM2-base-plus.py
-Qwen3-VL-8B-Instruct.py
-samples/
-result/
-run.sh
-requirement.txt
-README.md
-```
-
 ## Setup
 
 ```bash
@@ -55,7 +34,7 @@ python -m pip install torch torchvision --index-url https://download.pytorch.org
 python -m pip install -r requirement.txt
 ```
 
-## Run
+## Run with helper script
 
 ```bash
 chmod +x run.sh
@@ -65,7 +44,7 @@ chmod +x run.sh
 ./run.sh qwen3-vl
 ```
 
-Direct execution:
+The helper script is optional. The same demos can also be run directly:
 
 ```bash
 python Grounding-DINO.py
@@ -77,12 +56,16 @@ python Qwen3-VL-8B-Instruct.py
 
 ### Grounding DINO
 
+- Model: `IDEA-Research/grounding-dino-base`
+- Task: open-vocabulary object detection
 - Input: `samples/xai506_example_image.jpg`
 - Prompt: `a glasses. a person. a chair. a table.`
 - Output: `result/Grounding-DINO-base_result.png`
 
 ### SAM2
 
+- Model: `facebook/sam2-hiera-base-plus`
+- Task: selected-target segmentation
 - Input: `samples/xai506_example_image.jpg`
 - Left click: select one object/person to mask
 - Right click: exclude another object/person or background
@@ -92,6 +75,8 @@ python Qwen3-VL-8B-Instruct.py
 
 ### Qwen3-VL
 
+- Model: `Qwen/Qwen3-VL-8B-Instruct`
+- Task: visual question answering
 - Input: `samples/xai506_example_image.jpg`
 - Question: `How many people are in this image?. Answer in one sentence.`
 - Output: terminal text
