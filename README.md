@@ -14,17 +14,18 @@ Using Conda:
 ```bash
 chmod +x setup.sh
 ./setup.sh
-conda activate 2026010688
+conda activate foundation-models-midterm-$(whoami)
 ```
 
-Using venv:
+By default, `setup.sh` reads the CUDA version reported by `nvidia-smi` and chooses the newest supported PyTorch build automatically:
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-chmod +x setup.sh
-./setup.sh
+```text
+CUDA >= 12.8 -> cu128
+CUDA >= 12.4 -> cu124
+otherwise    -> cpu
 ```
+
+This detection is based on the CUDA version exposed by the installed NVIDIA driver. In practice, that is a good default for choosing the highest matching PyTorch wheel, but it does not guarantee that every package combination on every machine is optimal. If the detected choice does not work well on your system, force the runtime manually.
 
 If you want to force a runtime:
 
@@ -36,7 +37,7 @@ If you want to force a runtime:
 
 `setup.sh` reinstalls the PyTorch stack explicitly, then installs the pinned project dependencies. This avoids the common case where an older `torch` build stays in the environment and keeps forcing CPU fallback.
 
-When `conda` is installed, `setup.sh` creates the environment automatically and installs everything into `2026010688` by default. You can override the env name:
+`setup.sh` requires `conda`. It creates the environment automatically and installs everything into `foundation-models-midterm-$(whoami)` by default. You can override the env name:
 
 ```bash
 ./setup.sh cu124 myenv
@@ -95,15 +96,31 @@ Example conversation:
 
 ```text
 $ python Qwen3-VL-8B-Instruct.py
-Using device: mps
-Image: samples/classroom_test.jpg
+Using device: cuda
+Image: samples/xai506_example_image.jpg
 Ask questions about the image. Type 'exit' or 'quit' to stop.
 
 You: How many people are in this image?
-Qwen3-VL: There are several people sitting in a classroom.
+Qwen3-VL: Based on a careful count of the individuals visible in the image, there are **22 people** in the classroom.
+
+Here is a breakdown of the count:
+
+- **Front row (closest to the camera):** 3 people (one on the far left, one in the center, and one on the right).
+- **Second row:** 4 people.
+- **Third row:** 5 people.
+- **Fourth row:** 5 people.
+- **Fifth row (back row):** 5 people.
+
+This totals to 3 + 4 + 5 + 5 + 5 = 22 people.
 
 You: What are they doing?
-Qwen3-VL: They appear to be attending a class or lecture.
+Qwen3-VL: Based on the image, the people appear to be attending a **class or lecture**.
+
+Here's a more detailed description of what they are doing:
+
+- **Most are focused on their laptops:** Many students have open laptops on their desks, suggesting they are taking notes, following along with a presentation, or working on assignments related to the class.
+- **One person is actively speaking:** The man in the light grey t-shirt in the middle-right of the room is gesturing with his hands and looking forward, likely participating in a discussion or asking a question.
+- **One person appears to be resting:** The man on the far left is
 
 You: exit
 ```
@@ -123,4 +140,4 @@ You: exit
 - First run downloads model weights.
 - Grounding DINO and SAM2 require a display for Matplotlib windows.
 - Qwen3-VL can be heavy; CUDA is recommended.
-- If `Using device: cpu` appears unexpectedly, rerun `./setup.sh cu124` and then check `python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"`.
+- If `Using device: cpu` appears unexpectedly, run `nvidia-smi` first, then try `./setup.sh cu124` or `./setup.sh cu128`, and check `python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available())"`.

@@ -3,8 +3,48 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+default_user="$(id -un 2>/dev/null || whoami 2>/dev/null || echo user)"
+default_env_name="foundation-models-midterm-${default_user}"
+
+pick_runtime_from_cuda_version() {
+  local cuda_version="$1"
+  local major minor
+
+  IFS=. read -r major minor <<<"$cuda_version"
+  major="${major:-0}"
+  minor="${minor:-0}"
+
+  if (( major > 12 || (major == 12 && minor >= 8) )); then
+    echo "cu128"
+  elif (( major > 12 || (major == 12 && minor >= 4) )); then
+    echo "cu124"
+  else
+    echo "cpu"
+  fi
+}
+
+detect_runtime() {
+  local smi_output cuda_version runtime_choice
+
+  if ! command -v nvidia-smi >/dev/null 2>&1; then
+    echo "cpu"
+    return
+  fi
+
+  smi_output="$(nvidia-smi 2>/dev/null || true)"
+  cuda_version="$(printf '%s\n' "$smi_output" | sed -n 's/.*CUDA Version: \([0-9][0-9]*\.[0-9][0-9]*\+\).*/\1/p' | head -n 1)"
+
+  if [[ -z "$cuda_version" ]]; then
+    echo "cpu"
+    return
+  fi
+
+  runtime_choice="$(pick_runtime_from_cuda_version "$cuda_version")"
+  echo "$runtime_choice"
+}
+
 usage() {
-  cat <<'USAGE'
+  cat <<USAGE
 Usage:
   ./setup.sh [cpu|cu124|cu128] [env_name]
 
@@ -12,18 +52,19 @@ Examples:
   ./setup.sh
   ./setup.sh cpu
   ./setup.sh cu124
-  ./setup.sh cu124 2026010688
+  ./setup.sh cu124 ${default_env_name}
 
 Behavior:
-  - Creates a conda environment automatically when conda is available
+  - Creates a per-user conda environment automatically
   - Reinstalls torch/torchvision/torchaudio for the selected runtime
   - Installs pinned Python dependencies from requirement.txt
   - Prints the final torch/CUDA status
 
 Notes:
-  - Default is `cu124` when `nvidia-smi` is available, otherwise `cpu`
-  - Default conda env name is `2026010688`
-  - Without conda, use this inside your activated venv or Python environment
+  - Default runtime is chosen from the CUDA version reported by nvidia-smi
+  - CUDA >= 12.8 -> 'cu128', CUDA >= 12.4 -> 'cu124', otherwise 'cpu'
+  - Default conda env name is '${default_env_name}'
+  - Conda is required
 USAGE
 }
 
@@ -33,13 +74,9 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
 fi
 
 runtime="${1:-}"
-env_name="${2:-2026010688}"
+env_name="${2:-$default_env_name}"
 if [[ -z "$runtime" ]]; then
-  if command -v nvidia-smi >/dev/null 2>&1; then
-    runtime="cu124"
-  else
-    runtime="cpu"
-  fi
+  runtime="$(detect_runtime)"
 fi
 
 case "$runtime" in
@@ -59,21 +96,19 @@ case "$runtime" in
     ;;
 esac
 
-if ! command -v python >/dev/null 2>&1; then
-  if ! command -v conda >/dev/null 2>&1; then
-    echo "Error: neither python nor conda was found in PATH." >&2
-    exit 1
-  fi
+if ! command -v conda >/dev/null 2>&1; then
+  echo "Error: conda was not found in PATH." >&2
+  echo "Please install conda first, then rerun ./setup.sh." >&2
+  exit 1
 fi
 
-python_cmd=(python)
-if command -v conda >/dev/null 2>&1; then
-  if ! conda env list | awk '{print $1}' | grep -Fxq "$env_name"; then
-    echo "[0/4] Creating conda environment: $env_name"
-    conda create -n "$env_name" python=3.10 -y
-  fi
-  python_cmd=(conda run --no-capture-output -n "$env_name" python)
+if ! conda env list | awk '{print $1}' | grep -Fxq "$env_name"; then
+  echo "[0/4] Creating conda environment: $env_name"
+  conda create -n "$env_name" python=3.10 -y
 fi
+python_cmd=(conda run --no-capture-output -n "$env_name" python)
+
+echo "[info] Selected runtime: $runtime"
 
 echo "[1/4] Upgrading pip"
 "${python_cmd[@]}" -m pip install --upgrade pip
@@ -101,8 +136,6 @@ if [[ "$runtime" != "cpu" ]]; then
   }
 fi
 
-if command -v conda >/dev/null 2>&1; then
-  echo
-  echo "Done. Use this environment with:"
-  echo "  conda activate $env_name"
-fi
+echo
+echo "Done. Use this environment with:"
+echo "  conda activate $env_name"
