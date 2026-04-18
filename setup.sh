@@ -42,6 +42,35 @@ detect_runtime() {
   echo "$runtime_choice"
 }
 
+detect_installed_torch_runtime() {
+  "${python_cmd[@]}" -c '
+import importlib.util
+import sys
+
+if importlib.util.find_spec("torch") is None:
+    print("missing")
+    raise SystemExit(0)
+
+import torch
+
+cuda_version = torch.version.cuda
+if cuda_version is None:
+    print("cpu")
+    raise SystemExit(0)
+
+major_minor = cuda_version.split(".")
+major = int(major_minor[0]) if len(major_minor) > 0 and major_minor[0] else 0
+minor = int(major_minor[1]) if len(major_minor) > 1 and major_minor[1] else 0
+
+if major > 12 or (major == 12 and minor >= 8):
+    print("cu128")
+elif major > 12 or (major == 12 and minor >= 4):
+    print("cu124")
+else:
+    print("cpu")
+'
+}
+
 usage() {
   cat <<USAGE
 Usage:
@@ -55,7 +84,7 @@ Examples:
 
 Behavior:
   - Creates a conda environment automatically
-  - Reinstalls torch/torchvision/torchaudio for the selected runtime
+  - Installs torch/torchvision/torchaudio only when the runtime does not match
   - Installs pinned Python dependencies from requirement.txt
   - Prints the final torch/CUDA status
 
@@ -112,13 +141,20 @@ echo "[info] Selected runtime: $runtime"
 echo "[1/4] Upgrading pip"
 "${python_cmd[@]}" -m pip install --upgrade pip
 
-echo "[2/4] Reinstalling torch stack for $runtime"
-"${python_cmd[@]}" -m pip uninstall -y torch torchvision torchaudio || true
-"${python_cmd[@]}" -m pip install --no-cache-dir --index-url "$torch_index" \
-  torch torchvision torchaudio
+installed_torch_runtime="$(detect_installed_torch_runtime)"
+if [[ "$installed_torch_runtime" == "$runtime" ]]; then
+  echo "[2/4] Reusing existing torch stack for $runtime"
+else
+  echo "[2/4] Installing torch stack for $runtime"
+  if [[ "$installed_torch_runtime" != "missing" ]]; then
+    "${python_cmd[@]}" -m pip uninstall -y torch torchvision torchaudio || true
+  fi
+  "${python_cmd[@]}" -m pip install --index-url "$torch_index" \
+    torch torchvision torchaudio
+fi
 
 echo "[3/4] Installing pinned project dependencies"
-"${python_cmd[@]}" -m pip install --no-cache-dir -r requirement.txt
+"${python_cmd[@]}" -m pip install -r requirement.txt
 
 echo "[4/4] Verifying torch runtime"
 "${python_cmd[@]}" -c "import torch; print('torch', torch.__version__); print('torch_cuda', torch.version.cuda); print('cuda_available', torch.cuda.is_available())"
