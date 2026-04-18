@@ -3,8 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-default_user="$(id -un 2>/dev/null || whoami 2>/dev/null || echo user)"
-default_env_name="foundation-models-midterm-${default_user}"
+default_env_name="2026010688"
 
 pick_runtime_from_cuda_version() {
   local cuda_version="$1"
@@ -55,7 +54,7 @@ Examples:
   ./setup.sh cu124 ${default_env_name}
 
 Behavior:
-  - Creates a per-user conda environment automatically
+  - Creates a conda environment automatically
   - Reinstalls torch/torchvision/torchaudio for the selected runtime
   - Installs pinned Python dependencies from requirement.txt
   - Prints the final torch/CUDA status

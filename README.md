@@ -14,7 +14,7 @@ Using Conda:
 ```bash
 chmod +x setup.sh
 ./setup.sh
-conda activate foundation-models-midterm-$(whoami)
+conda activate 2026010688
 ```
 
 By default, `setup.sh` reads the CUDA version reported by `nvidia-smi` and chooses the newest supported PyTorch build automatically:
@@ -37,7 +37,7 @@ If you want to force a runtime:
 
 `setup.sh` reinstalls the PyTorch stack explicitly, then installs the pinned project dependencies. This avoids the common case where an older `torch` build stays in the environment and keeps forcing CPU fallback.
 
-`setup.sh` requires `conda`. It creates the environment automatically and installs everything into `foundation-models-midterm-$(whoami)` by default. You can override the env name:
+`setup.sh` requires `conda`. It creates the environment automatically and installs everything into `2026010688` by default. You can override the env name:
 
 ```bash
 ./setup.sh cu124 myenv
@@ -88,6 +88,7 @@ python Qwen3-VL-8B-Instruct.py
 - Model: `Qwen/Qwen3-VL-2B-Instruct`
 - Task: visual question answering
 - Input: `samples/classroom_test.jpg`
+- Tested with: 1 x NVIDIA GeForce RTX 4090 24GB
 - Ask multiple questions about the image in the terminal.
 - Type `exit` or `quit` to stop.
 - Use another image: `python Qwen3-VL-8B-Instruct.py --image samples/xai506_example_image.jpg`
