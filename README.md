@@ -1,13 +1,13 @@
 # Deep Learning Mid-term Assignment
 
-Three Hugging Face vision foundation model demos: object detection, selected-student segmentation, and visual question answering.
+Three Hugging Face vision foundation model demos: object detection, selected-target segmentation, and visual question answering.
 
 ## Models
 
 | Script | Model | Task |
 |--------|-------|------|
 | `Grounding-DINO.py` | `IDEA-Research/grounding-dino-base` | Open-vocabulary object detection |
-| `SAM2-base-plus.py` | `facebook/sam2-hiera-base-plus` | Selected-student segmentation |
+| `SAM2-base-plus.py` | `facebook/sam2-hiera-base-plus` | Selected-target segmentation |
 | `Qwen3-VL-8B-Instruct.py` | `Qwen/Qwen3-VL-8B-Instruct` | Visual question answering |
 
 ## Files
@@ -77,15 +77,15 @@ python Qwen3-VL-8B-Instruct.py
 
 ### Grounding DINO
 
-- Input: `samples/classroom_test.jpg`
+- Input: `samples/xai506_example_image.jpg`
 - Prompt: `a glasses. a person. a chair. a table.`
 - Output: `result/Grounding-DINO-base_result.png`
 
 ### SAM2
 
-- Input: `samples/classroom_test.jpg`
-- Left click: select one student to mask
-- Right click: exclude another student or background
+- Input: `samples/xai506_example_image.jpg`
+- Left click: select one object/person to mask
+- Right click: exclude another object/person or background
 - Backspace: undo
 - Enter: run segmentation
 - Output: `result/SAM2-base-plus_result.png`

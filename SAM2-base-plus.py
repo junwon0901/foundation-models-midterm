@@ -25,7 +25,7 @@ def get_click_inputs(image):
     fig, ax = plt.subplots(figsize=(10, 7))
     ax.imshow(image)
     ax.set_title(
-        "Left click = selected student, Right click = exclude, Enter = finish, Backspace = undo"
+        "Left click = target object/person, Right click = exclude, Enter = finish, Backspace = undo"
     )
     ax.axis("on")
 
@@ -88,10 +88,10 @@ def get_click_inputs(image):
     negative_points = [point for point, label in clicks if label == 0]
 
     if not positive_points:
-        raise RuntimeError("No selected students were clicked.")
+        raise RuntimeError("No target objects or people were clicked.")
 
-    # Treat each positive click as a separate target student. Negative clicks are
-    # shared across all targets to suppress unselected students/background.
+    # Treat each positive click as a separate target. Negative clicks are shared
+    # across all targets to suppress unselected objects/people or background.
     object_points = []
     object_labels = []
     for positive_point in positive_points:
@@ -145,7 +145,7 @@ for point, label in clicks:
 
 axes[1].imshow(raw_image)
 axes[1].imshow(combined_mask, alpha=0.5)
-axes[1].set_title("Selected student masks")
+axes[1].set_title("Selected target masks")
 axes[1].axis("off")
 
 fig.tight_layout()
